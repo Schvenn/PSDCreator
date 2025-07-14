@@ -173,7 +173,7 @@ LicenseUri =            <- DefaultLicenseURISuffix is set in PSDCreator.psd1.
                            This appends to ProjectUri, based on standard GitHub URI format.
 ProjectUri =            <- This default is set in PSDCreator.psd1.
 ReleaseNotes =          <- This defaults to 'Initial release.'
-
+}
 CustomFields =          <- All of these and their values are populated at the prompt.
 }}
 ## License
