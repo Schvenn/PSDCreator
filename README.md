@@ -9,6 +9,9 @@ PSDCreator creates PSD1 files for new modules and writes them to disk for you, s
     • Description
     • Tags
     • All custom fields
+
+![](https://raw.githubusercontent.com/Schvenn/PSDCreator/refs/heads/main/screenshots/PSDCreator.png)
+
 ## Fields Written to Disk
 All fields below can be modified at the prompt.
 
@@ -32,6 +35,6 @@ All fields below can be modified at the prompt.
                                This appends to ProjectUri, based on standard GitHub URI format.
     ProjectUri =            <- This default is set in PSDCreator.psd1.
     ReleaseNotes =          <- This defaults to 'Initial release.'
-    
+    }
     CustomFields =          <- All of these and their values are populated at the prompt.
     }}
