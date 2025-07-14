@@ -136,6 +136,8 @@ if ($confirmcontinue -match "^[Nn]") {Write-Host -f red "Creation aborted."`n; r
 else {try {$full | Out-File -FilePath "$powershell\modules\$function\$function.psd1" -Encoding UTF8 -Force; Write-Host -f green "$function.psd1 written to disk.`n"}
 catch {Write-Host -f red "$_`nWrite failed.`n"}; return}}
 
+Export-ModuleMember -function psdcreator
+
 # Helptext.
 
 <#
