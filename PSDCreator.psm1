@@ -66,7 +66,7 @@ if ([string]::IsNullOrWhiteSpace($rootmodule)) {Write-Host -f red "`nThe module 
 $rootmodule = if ([System.IO.Path]::HasExtension($rootmodule)) {$rootmodule} else {"$rootmodule.psm1"}
 
 if (-not $defaults) {Write-Host -f white "ModuleVersion (" -n; Write-Host -f yellow "$script:defaultmoduleversion" -n; Write-Host -f white "): " -n; $moduleversion = read-host}
-$moduleversion = if ($moduleversion.length -lt 1) {$script:defaultmoduleversion}
+$moduleversion = if ($moduleversion.length -lt 1) {$script:defaultmoduleversion} else {$moduleversion}
 
 $guid = [guid]::NewGuid().ToString()
 if (-not $defaults) {Write-Host -f white "GUID: " -n; Write-Host -f yellow $guid}
@@ -88,23 +88,23 @@ $powershellversion = if ($powershellversion.length -lt 1) {$script:defaultpowers
 
 $function = [System.IO.Path]::GetFileNameWithoutExtension($rootmodule)
 if (-not $defaults) {Write-Host -f white "FunctionsToExport (" -n; Write-Host -f yellow "$function" -n; Write-Host -f white "): " -n; $functions = read-host}
-$functions = if ($functions.Length -gt 0) {($functions -split ',' | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {"`'$function`'"}
+$functions = if ($functions.Length -gt 0) {($functions -split ',' | Sort-Object | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {"`'$function`'"}
 
 if (-not $defaults) {Write-Host -f white "CmdletsToExport: " -n; $cmdlets = read-host}
-$cmdlets = if ($cmdlets.Length -gt 0) {($cmdlets -split ',' | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {$null}
+$cmdlets = if ($cmdlets.Length -gt 0) {($cmdlets -split ',' | Sort-Object | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {$null}
 
 if (-not $defaults) {Write-Host -f white "VariablesToExport: " -n; $variables = read-host}
-$variables = if ($variables.Length -gt 0) {($variables -split ',' | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {$null}
+$variables = if ($variables.Length -gt 0) {($variables -split ',' | Sort-Object | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {$null}
 
 if (-not $defaults) {Write-Host -f white "AliasesToExport: " -n; $aliases = read-host}
-$aliases = if ($aliases.Length -gt 0) {($aliases -split ',' | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {$null}
+$aliases = if ($aliases.Length -gt 0) {($aliases -split ',' | Sort-Object | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {$null}
 
-$defaultfiles = @("'$rootmodule', 'license.txt'")
+$defaultfiles = @("'$rootmodule'")
 if (-not $defaults) {Write-Host -f white "FileList (" -n; Write-Host -f yellow "$defaultfiles" -n; Write-Host -f white "): " -n; $filelist = read-host}
-$filelist = if ($filelist.Length -gt 0) {($filelist -split ',' | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {"$defaultfiles"}
+$filelist = if ($filelist.Length -gt 0) {($filelist -split ',' | Sort-Object | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {"$defaultfiles"}
 
 Write-Host -f white "Tags: " -n; $tags = read-host
-$tags = if ($tags.Length -gt 0) {($tags -split ',' | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {$null}
+$tags = if ($tags.Length -gt 0) {($tags -split ',' | Sort-Object | ForEach-Object {"'$($_.Trim())'"}) -join ', '} else {$null}
 
 $defaultlicenseuri = "$defaultprojecturi/$function/$script:defaultlicenseurisuffix"
 if (-not $defaults) {Write-Host -f white "LicenseUri (" -n; Write-Host -f yellow "$defaultlicenseuri" -n; Write-Host -f white "): " -n; $licenseuri = read-host}
@@ -116,7 +116,7 @@ $projecturi = if ($projecturi.length -lt 1) {$script:defaultprojecturi}
 
 $defaultreleasenotes = "Initial release."
 if (-not $defaults) {Write-Host -f white "ReleaseNotes (" -n; Write-Host -f yellow "$defaultreleasenotes" -n; Write-Host -f white "): " -n; $releasenotes = read-host}
-$releasenotes = if ($releasenotes.length -lt 1) {$defaultreleasenotes}
+$releasenotes = if ($releasenotes.length -lt 1) {$defaultreleasenotes} else {$releasenotes}
 
 $tophalf = "@{RootModule = '$rootmodule'`nModuleVersion = '$moduleversion'`nGUID = '$guid'`nAuthor = '$authour'`nCompanyName = '$companyname'`nCopyright = '$copyright'`nDescription = '$description'`nPowerShellVersion = '$powershellversion'`nFunctionsToExport = @($functions)`nCmdletsToExport = @($cmdlets)`nVariablesToExport = @($variables)`nAliasesToExport = @($aliases)`nFileList = @($filelist)`n`nPrivateData = @{PSData = @{Tags = @($tags)`nLicenseUri = '$licenseuri'`nProjectUri = '$projecturi'`nReleaseNotes = '$releasenotes'}"
 
@@ -125,8 +125,8 @@ $customVariables = @{}
 for ($i = 1; $i -le $customcount; $i++) {Write-Host -f white "`nCustom variable $i name: " -n; $varName = Read-Host
 if ([string]::IsNullOrWhiteSpace($varName)) {Write-Host -f yellow "Variable name cannot be empty. Skipping."; continue}
 Write-Host -f white "Default value for '$varName': " -n; $varValue = Read-Host
-$customVariables[$varName] = $varValue}
-if ($customVariables.Count -gt 0) {$bottomhalf = "`n"; foreach ($key in $customVariables.Keys) {$bottomhalf += "`n$key = '$($customVariables[$key])'"}}
+$varValue = ($varValue -split ',' | Sort-Object | ForEach-Object {"'$($_.Trim())'"}) -join ', '; $varValue = $varValue -replace "''", "'"; $customVariables[$varName] = $varValue}
+if ($customVariables.Count -gt 0) {$bottomhalf = "`n"; foreach ($key in $customVariables.Keys) {$bottomhalf += "`n$key = $($customVariables[$key])"}}
 $bottomhalf += "}}"; $full=$tophalf+$bottomhalf
 
 line yellow 100; Write-Host -f cyan "Confirm output to: " -n; Write-Host -f yellow "$powershell\modules\$function\$function.psd1`n"
@@ -167,7 +167,7 @@ FunctionsToExport = @() <- This defaults to the RootModule name.
 CmdletsToExport = @()   <- This is optional.
 VariablesToExport = @() <- This is optional.
 AliasesToExport = @()   <- This is optional.
-FileList = @()          <- This defaults to the RootModule name as the PSM1 file and license.txt
+FileList = @()          <- This defaults to the RootModule.psm1 file.
 
 PrivateData = @{PSData = 
 @{Tags = @()}           <- This must be populated at the prompt.
